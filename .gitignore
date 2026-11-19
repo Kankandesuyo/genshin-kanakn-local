@@ -1,0 +1,37 @@
+# Per-machine secrets and settings
+credentials.local.json
+local-config.json
+server/config.json
+
+# Saves, logs, caches
+db/
+logs/
+server/logs/
+server/cache/
+server/GM Handbook/
+server/data/*_claimed.json
+server/data/*_respawn.json
+server/data/*state*.json
+server/data/*.flag
+
+# Downloaded by Setup.cmd (third-party / game data, never committed)
+server/resources/
+server/grasscutter.jar
+server/plugins/*.jar
+runtime/downloads/
+runtime/mongodb/
+runtime/sophon/
+runtime/patch/
+runtime/**/target/
+runtime/**/bin/
+runtime/**/obj/
+runtime/statue-compat/classes/
+
+# Game client and its backups
+client-7.1/
+client-backup/
+*.zip
+*.zst
+*.dll
+*.exe
+release-assets/

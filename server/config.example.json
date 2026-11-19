@@ -1,0 +1,49 @@
+﻿{
+    "server":  {
+                   "http":  {
+                                "accessPort":  8088,
+                                "webConsole":  {
+                                                   "enabled":  true,
+                                                   "password":  "CHANGE_ME",
+                                                   "sessionHours":  12
+                                               },
+                                "bindAddress":  "127.0.0.1",
+                                "accessAddress":  "127.0.0.1",
+                                "encryption":  {
+                                                   "useInRouting":  false,
+                                                   "useEncryption":  false
+                                               },
+                                "bindPort":  8088
+                            },
+                   "game":  {
+                                "enableConsole":  true,
+                                "accessAddress":  "127.0.0.1",
+                                "accessPort":  22101,
+                                "bindPort":  22101,
+                                "bindAddress":  "127.0.0.1",
+                                "gameOptions":  {
+                                                    "mapFogEnabled":  false
+                                                }
+                            }
+               },
+    "databaseInfo":  {
+                         "server":  {
+                                        "connectionUri":  "mongodb://127.0.0.1:27018",
+                                        "collection":  "astaps_local"
+                                    },
+                         "game":  {
+                                      "connectionUri":  "mongodb://127.0.0.1:27018",
+                                      "collection":  "astaps_local"
+                                  }
+                     },
+    "account":  {
+                    "useIntegrationPassword":  false,
+                    "EXPERIMENTAL_RealPassword":  true,
+                    "maxPlayer":  1,
+                    "autoCreate":  false,
+                    "defaultPermissions":  [
+                                               "*"
+                                           ]
+                },
+    "version":  18
+}

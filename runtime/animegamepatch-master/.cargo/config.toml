@@ -1,0 +1,6 @@
+[source.crates-io]
+replace-with = "vendored-sources"
+[source.vendored-sources]
+directory = "E:/kankancs/runtime/cargo-vendor"
+[net]
+offline = true
