@@ -41,7 +41,7 @@
 | --- | --- |
 | `Start.cmd` / `Stop.cmd` | 启动 / 安全保存并关闭服务端 |
 | `Play-Local.cmd` | 检查补丁和服务端后启动游戏 |
-| `Local-Manager.ps1` | 图形管理器 |
+| `Manager.cmd` | 双击打开图形管理器（`Local-Manager.ps1`）；需要先启动服务端 |
 | <http://127.0.0.1:8088/console> | 网页控制台，密码为 `consolePassword`；命令不带斜杠，`help` 查看全部 |
 | `console-command.ps1 -Command 'help'` | 命令行执行服务端命令 |
 | `Restore-Client.cmd` | 把客户端恢复成官方原版 DLL |
