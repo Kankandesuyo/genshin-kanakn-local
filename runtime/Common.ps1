@@ -2,6 +2,17 @@
 # Per-machine settings live in local-config.json (created by setup-local.ps1, not tracked by git).
 $script:RepoRoot = Split-Path -Parent $PSScriptRoot
 
+function Read-PlainPassword([string]$prompt) {
+    $secure = Read-Host $prompt -AsSecureString
+    $ptr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+    try { [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr) } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr) }
+}
+
+function Test-GamePassword([string]$password) {
+    # The password is sent as one console-command argument, so it cannot contain whitespace.
+    if ($password.Length -lt 6 -or $password -match '\s') { throw 'Password must be at least 6 characters with no spaces.' }
+}
+
 function Get-LocalConfig {
     $path = Join-Path $script:RepoRoot 'local-config.json'
     $cfg = [ordered]@{ java = ''; clientPath = ''; directInterface = ''; cdnIp = '' }

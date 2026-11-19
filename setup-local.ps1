@@ -1,4 +1,4 @@
-param([string]$ClientPath, [switch]$SkipAccount)
+param([string]$ClientPath, [string]$Username, [string]$Password, [switch]$SkipAccount)
 # One-time setup on a new machine: downloads runtime pieces from their original sources,
 # generates fresh local passwords, and creates the local game account. Re-running is safe.
 $ErrorActionPreference = 'Stop'
@@ -82,7 +82,22 @@ if (!(Test-Path "$root\server\resources\ExcelBinOutput")) {
 Write-Host '[6/6] Passwords and local account'
 $credPath = "$root\credentials.local.json"
 if (!(Test-Path $credPath)) {
-    @{ playerUsername='player'; playerPassword=(New-Secret); consolePassword=(New-Secret 24) } | ConvertTo-Json | Set-Content -Encoding UTF8 $credPath
+    if (!$Username) {
+        $Username = Read-Host 'Game username (letters/digits/_, Enter = player)'
+        if (!$Username) { $Username = 'player' }
+    }
+    if ($Username -notmatch '^[A-Za-z0-9_]{3,20}$') { throw 'Username must be 3-20 letters, digits or _.' }
+    if (!$Password) {
+        while ($true) {
+            $p1 = Read-PlainPassword 'Game password (6+ chars, no spaces, Enter = random)'
+            if (!$p1) { $Password = New-Secret; Write-Host '  random password generated (see credentials.local.json)'; break }
+            $p2 = Read-PlainPassword 'Repeat password'
+            if ($p1 -ne $p2) { Write-Host '  passwords do not match, try again'; continue }
+            $Password = $p1; break
+        }
+    }
+    Test-GamePassword $Password
+    @{ playerUsername=$Username; playerPassword=$Password; consolePassword=(New-Secret 24) } | ConvertTo-Json | Set-Content -Encoding UTF8 $credPath
 }
 $cred = Get-Content $credPath -Raw | ConvertFrom-Json
 if (!(Test-Path "$root\server\config.json")) {
