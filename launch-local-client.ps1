@@ -29,6 +29,13 @@ foreach ($attempt in 1..360) {
 }
 if (!$ready) { throw 'Local server is not ready. Check server/logs/latest.log.' }
 if (Get-Process GenshinImpact -ErrorAction SilentlyContinue) { throw 'Genshin is already running. Close it before launching this copy.' }
+# Keep the patch's draggable damage-statistics overlay hidden (Ctrl+K still toggles it for the session).
+$overlayConfig = Join-Path $client 'lunagc-patch.json'
+$overlay = [ordered]@{ showDamagePanel = $false; fpsUnlock = $true; fpsTarget = 120 }
+if (Test-Path $overlayConfig) {
+    try { $old = Get-Content $overlayConfig -Raw | ConvertFrom-Json; if ($null -ne $old.fpsUnlock) { $overlay.fpsUnlock = [bool]$old.fpsUnlock }; if ($null -ne $old.fpsTarget) { $overlay.fpsTarget = [int]$old.fpsTarget } } catch { }
+}
+$overlay | ConvertTo-Json | Set-Content $overlayConfig -Encoding ASCII
 $env:LUNAGC_PATCH_LOG = "$root\logs\client-patch.log"
 $env:HTTP_PROXY = ''
 $env:HTTPS_PROXY = ''

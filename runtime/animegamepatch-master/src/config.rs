@@ -6,7 +6,7 @@ use serde_json::{json, Value};
 const FILE_NAME: &str = "lunagc-patch.json";
 const DEFAULT_FPS: i32 = 120;
 
-pub static SHOW_PANEL: AtomicBool = AtomicBool::new(true);
+pub static SHOW_PANEL: AtomicBool = AtomicBool::new(false);
 pub static FPS_ENABLED: AtomicBool = AtomicBool::new(true);
 pub static FPS_TARGET: AtomicI32 = AtomicI32::new(DEFAULT_FPS);
 
