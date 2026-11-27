@@ -20,7 +20,7 @@ function Get-LocalConfig {
         $file = Get-Content $path -Raw | ConvertFrom-Json
         foreach ($p in $file.PSObject.Properties) { $cfg[$p.Name] = $p.Value }
     }
-    if (!$cfg.clientPath) { $cfg.clientPath = Join-Path $script:RepoRoot 'client-7.1' }
+    if (!$cfg.clientPath) { $cfg.clientPath = Join-Path $script:RepoRoot 'client-7.2' }
     if (!$cfg.java) {
         $cmd = Get-Command java.exe -ErrorAction SilentlyContinue
         if ($cmd) { $cfg.java = $cmd.Source }

@@ -29,6 +29,7 @@ runtime/statue-compat/classes/
 
 # Game client and its backups
 client-7.1/
+client-7.2/
 client-backup/
 *.zip
 *.zst

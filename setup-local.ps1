@@ -40,7 +40,7 @@ Write-Host '[1/6] Local settings'
 $configPath = "$root\local-config.json"
 if (!(Test-Path $configPath)) {
     if (!$ClientPath) {
-        $default = Join-Path $root 'client-7.1'
+        $default = Join-Path $root 'client-7.2'
         $ClientPath = Read-Host "Game client folder (needs ~150 GB free) [$default]"
         if (!$ClientPath) { $ClientPath = $default }
     }

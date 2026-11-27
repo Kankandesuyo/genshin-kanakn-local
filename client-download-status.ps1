@@ -5,7 +5,7 @@ $samples = @{}
 do {
 if ($Watch) {
     Clear-Host
-    $Host.UI.RawUI.WindowTitle = 'Genshin 7.1 download progress'
+    $Host.UI.RawUI.WindowTitle = 'Genshin 7.2 download progress'
     Write-Host 'Auto refresh: every 3 seconds. Closing this window does not stop the download.'
     Write-Host ''
 }

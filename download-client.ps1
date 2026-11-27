@@ -20,7 +20,7 @@ $PID | Set-Content "$root\logs\client-supervisor.pid"
 try {
     $build = Get-Content "$root\manifests\official-sophon-build.json" -Raw | ConvertFrom-Json
     $branch = Get-Content "$root\manifests\official-game-branches.json" -Raw | ConvertFrom-Json
-    if ($build.data.tag -ne '7.1.0' -or $branch.data.game_branches[0].main.tag -ne '7.1.0') { throw 'Expected pinned 7.1.0 official manifests.' }
+    if ($build.data.tag -ne '7.2.0' -or $branch.data.game_branches[0].main.tag -ne '7.2.0') { throw 'Expected pinned 7.2.0 official manifests.' }
     $requiredBytes = ($build.data.manifests | Where-Object matching_field -in @('game','zh-cn') | ForEach-Object {[long]$_.stats.uncompressed_size} | Measure-Object -Sum).Sum
     $freeBytes = (Get-PSDrive (Split-Path -Qualifier (Resolve-Path $destination)).TrimEnd(':')).Free
     if ($freeBytes -lt ($requiredBytes + 10GB) -and !(Test-Path "$destination\download-progress-game.json")) { throw "Not enough free space for $destination (needs about 150 GB)." }
@@ -39,16 +39,15 @@ try {
     $env:SOPHON_BUILD_JSON = "$root\manifests\official-sophon-build.json"
     foreach ($package in @('game','zh-cn')) {
         $existingProgress = "$destination\download-progress-$package.json"
-        if (Test-Path $existingProgress) {
-            $finished = Get-Content $existingProgress -Raw | ConvertFrom-Json
-            if ($finished.state -eq 'completed' -and $finished.completedFiles -eq $finished.totalFiles -and $finished.bytesWritten -eq $finished.totalBytes) { continue }
-        }
+        # A previous release can leave a completed progress file in the same folder.
+        # Let Sophon verify existing files against the current release on every run.
+        if (Test-Path $existingProgress) { Remove-Item -LiteralPath $existingProgress }
         $success = $false
         foreach ($attempt in 1..3) {
             Save-State 'downloading' $package "Attempt $attempt of 3. Files use official HoYoverse CDN."
             # Optional: force an official CDN IP (only if DNS for autopatchhk.yuanshen.com is broken).
             if ($cfg.cdnIp) { $env:SOPHON_CDN_IP = $cfg.cdnIp }
-            $args = @('full','hk4e',$package,'7.1.0',$destination,'--silent','--threads=24','--handles=32')
+            $args = @('full','hk4e',$package,'7.2.0',("`"" + $destination + "`""),'--silent','--threads=24','--handles=32')
             $process = Start-Process -FilePath $exe -ArgumentList $args -WindowStyle Hidden -RedirectStandardOutput "$root\logs\client-$package.stdout.log" -RedirectStandardError "$root\logs\client-$package.stderr.log" -PassThru
             $process.Id | Set-Content "$root\logs\client-worker.pid"
             $process.WaitForExit()
