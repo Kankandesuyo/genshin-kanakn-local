@@ -58,7 +58,8 @@
       4124,
       4127,
       4132,
-      4148
+      4148,
+      4137
     ],
     "fallbackItems4Pool2": [
       11401,
@@ -220,12 +221,14 @@
     "prefabPath": "GachaShowPanel_A022",
     "costItemId": 223,
     "rateUpItems5": [
-      4106
+      1095,
+      4136
     ],
     "rateUpItems4": [
       1031,
       1032,
-      1025
+      1025,
+      4137
     ],
     "removeC6FromPool": false,
     "fallbackItems4Pool1": [
@@ -279,7 +282,8 @@
       4124,
       4127,
       4132,
-      4148
+      4148,
+      4137
     ],
     "fallbackItems4Pool2": []
   },
@@ -291,7 +295,8 @@
     "prefabPath": "GachaShowPanel_A019",
     "costItemId": 223,
     "rateUpItems5": [
-      12514
+      15513,
+      14525
     ],
     "rateUpItems4": [
       11401,
@@ -531,7 +536,8 @@
       4133,
       4140,
       4143,
-      4150
+      4150,
+      4136
     ],
     "rateUpItems4": [
       1021,
@@ -584,7 +590,8 @@
       4124,
       4127,
       4132,
-      4148
+      4148,
+      4137
     ],
     "fallbackItems5Pool1": [
       1026,
@@ -655,7 +662,8 @@
       4133,
       4140,
       4143,
-      4150
+      4150,
+      4136
     ],
     "fallbackItems5Pool2": [],
     "fallbackItems4Pool1": [
@@ -709,7 +717,8 @@
       4124,
       4127,
       4132,
-      4148
+      4148,
+      4137
     ],
     "fallbackItems4Pool2": [],
     "removeC6FromPool": false,

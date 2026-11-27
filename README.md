@@ -3,7 +3,7 @@
 在**你自己电脑上**运行的离线本地服：服务端、数据库、存档都只在本机（`127.0.0.1`），不连接任何别人的服务器，也不开放公网端口。
 
 > 本仓库**不包含**游戏客户端、游戏资源或任何人的账号密码。
-> 双击 `Download-Client.cmd` 可从 **HoYoverse 官方 CDN** 下载原版 **7.2.0 国际版**本体和中文语音。仓库现有 v1.0.0 服务端及补丁安装脚本仍针对 7.1.0。
+> 双击 `Download-Client.cmd` 可从 **HoYoverse 官方 CDN** 下载原版 **7.2.0 国际版**本体和中文语音。服务端固定为 AstaPS 7.2.162。角色 UP 池加入米提亚、瓦列里，武器 UP 池加入秘星典谕。管理器可在玩家离线时显示已配置的 UP 名单。
 > 仅供个人学习研究；请勿用米哈游账号密码登录本地服，也不要把本地服开放给他人。
 
 ## 需要准备
@@ -11,7 +11,7 @@
 | 项目 | 说明 |
 | --- | --- |
 | Windows 10/11 x64 | 脚本基于 PowerShell 5.1 |
-| Java 17 或更高 | <https://adoptium.net/> 安装后 `java` 在 PATH 里即可 |
+| Java 21 或更高 | <https://adoptium.net/> 安装后 `java` 在 PATH 里即可 |
 | .NET 9 运行时 | 客户端下载器需要：<https://dotnet.microsoft.com/download/dotnet/9.0>（选 .NET Runtime） |
 | 磁盘空间 | 客户端约 140 GiB（本体 126.5 GiB + 中文语音 13.5 GiB），建议至少预留 150 GiB，服务端资源约 2 GB |
 | 内存 | 建议 16 GB 以上（服务端最多占 4 GB） |
@@ -21,7 +21,7 @@
 1. 下载本仓库：右上角 **Code → Download ZIP** 解压，或 `git clone`。路径里最好不要有中文和空格。
 2. 双击 **`Setup.cmd`**（只需一次）。会自动：
    - 询问客户端存放目录（默认是本文件夹下的 `client-7.2`）；
-   - 从本仓库 Release 下载服务端 `grasscutter.jar`、插件、客户端补丁和下载器（带 SHA256 校验）；
+   - 从 AstaPS 7.2.162 Release 下载服务端，从本仓库 v1.0.0 Release 下载配套插件、客户端补丁和下载器（带 SHA256 校验）；
    - 从 MongoDB 官网下载 MongoDB 8.0.12（便携版，不安装服务）；
    - 从 [MeChen618/AstaPS-Resource](https://github.com/MeChen618/AstaPS-Resource) 下载服务端资源；
    - 让你**自己输入游戏用户名和密码**（直接回车则用户名为 `player`、密码随机生成），
@@ -29,7 +29,6 @@
    首次启动服务端加载资源约需 5 分钟。
 3. 双击 **`Download-Client.cmd`** 从官方 CDN 下载 7.2.0 原版客户端（可中断，重新运行会跳过已校验文件）。
    双击 **`Download-Status.cmd`** 查看进度。
-**原版 7.2.0 下载到此完成。以下本地服步骤仅适用于另行准备的 7.1.0 客户端，需先把 `clientPath` 指向该目录。**
 
 4. 双击 **`Install-Patch.cmd`**，给这份客户端装上本地服补丁（原版 DLL 自动备份）。
 5. 双击 **`Play-Local.cmd`** 开玩，用第 2 步设置的用户名和密码登录（忘了可查看 `credentials.local.json`）。
@@ -73,7 +72,7 @@
 
 将 `clientPath` 指向原目录，再运行 `Download-Client.cmd`。下载器按 7.2.0 清单校验和复用文件，修改过的官方文件也会恢复成原版。
 
-**已有 7.1.0 客户端，想使用仓库的 v1.0.0 本地服**
+**已有 7.2.0 国际版客户端，想连接本地服**
 把 `local-config.json` 中的 `clientPath` 改成你的客户端目录（里面有 `GenshinImpact.exe`），然后直接运行 `Install-Patch.cmd`。
 建议复制一份单独的客户端，补丁会替换其中的 `Astrolabe.dll`（可用 `Restore-Client.cmd` 恢复）。
 
@@ -85,13 +84,17 @@
 
 ## 来源与许可
 
-- 服务端：[MeChen618/AstaPS](https://github.com/MeChen618/AstaPS)（Grasscutter 分支，AGPL-3.0，见 `server/LICENSE`），本仓库附带本地改动版本
-- 服务端资源：[MeChen618/AstaPS-Resource](https://github.com/MeChen618/AstaPS-Resource)（固定在提交 `c0213668`）
+- 服务端：[MeChen618/AstaPS](https://github.com/MeChen618/AstaPS)（Grasscutter 分支，AGPL-3.0，见 `server/LICENSE`），当前运行包的基础源码见 [7.2.162](https://github.com/MeChen618/AstaPS/tree/7.2.162)。仓库保留旧版服务端源码供参考。启动入口优先加载 `server/local-gacha.jar`，其本地定制源码为仓库中的 `GachaHandler.java` 和 `PacketDoGachaRsp.java`
+- 服务端资源：[MeChen618/AstaPS-Resource](https://github.com/MeChen618/AstaPS-Resource)（固定在提交 `f2800e32`）
 - 客户端补丁：[capyb2222/animegamepatch](https://github.com/capyb2222/animegamepatch)，源码在 `runtime/animegamepatch-master`
 - 本地插件 LocalStatueCompat：源码在 `runtime/statue-compat`
 - MongoDB：<https://www.mongodb.com/>
 
+已有安装请先用 `Stop.cmd` 停服，更新仓库后再次运行 `Setup.cmd` 安装服务端与资源，再用 `Start.cmd` 启动。
+
 ## 已知问题
+
+- 秘星典谕已加入武器池，上游 7.2 资源尚缺该武器的被动效果定义。
 
 - 资源包缺少 `StatuePromoteExcelConfigData`，神像升级等相关玩法可能不正常。
 - 缺少泰语 TextMapTH，不影响中文。

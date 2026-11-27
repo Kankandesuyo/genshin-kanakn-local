@@ -23,7 +23,7 @@ if (!(Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyCo
         $existing = Get-Process -Id ([int](Get-Content "$root\logs\server.pid")) -ErrorAction SilentlyContinue
         if ($existing -and $existing.Path -eq $java) { Write-Host 'Server is already starting.'; exit }
     }
-    $serverProcess = Start-Process -FilePath $java -ArgumentList @('-Xms512m','-Xmx4g','-jar','grasscutter.jar') -WorkingDirectory "$root\server" -WindowStyle Hidden -RedirectStandardOutput "$root\logs\server.stdout.log" -RedirectStandardError "$root\logs\server.stderr.log" -PassThru
+    $serverProcess = Start-Process -FilePath $java -ArgumentList @('-Xms512m','-Xmx4g','-cp','local-gacha.jar;grasscutter.jar','emu.grasscutter.Grasscutter') -WorkingDirectory "$root\server" -WindowStyle Hidden -RedirectStandardOutput "$root\logs\server.stdout.log" -RedirectStandardError "$root\logs\server.stderr.log" -PassThru
     $serverProcess.Id | Set-Content "$root\logs\server.pid"
 }
 Write-Host 'Local server starting. Console: http://127.0.0.1:8088/console'

@@ -18,7 +18,7 @@ if __name__=='__main__':
     backup=root/'logs/LocalBanners-before-full-four-stars.json'
     if not backup.exists():shutil.copy2(p,backup)
     complete(rows)
-    assert len(chars)==51 and len(weapons)>100
+    assert 4137 in chars and len(weapons)>100
     for b in rows:
         eligible=set(b['fallbackItems4Pool1']+b['fallbackItems4Pool2']+b.get('rateUpItems4',[]))
         required=set(weapons if b['bannerType']=='WEAPON' else chars+weapons if b['bannerType']=='STANDARD' else chars)

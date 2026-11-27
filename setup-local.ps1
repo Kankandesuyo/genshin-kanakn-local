@@ -11,15 +11,14 @@ $downloads = "$root\runtime\downloads"
 $repo = 'Kankandesuyo/genshin-kanakn-local'
 $releaseTag = 'v1.0.0'
 $assets = @(
-    @{ name='grasscutter.jar'; target="$root\server\grasscutter.jar"; sha='40D32550A7FB823A5089BC931D6644895BE8E8D3AF4385DD96A285D13BCF7DC1' },
     @{ name='LocalStatueCompat.jar'; target="$root\server\plugins\LocalStatueCompat.jar"; sha='633082596FFEFA6DF04811C921C8F5761952FB590F607D5D77E6A8CC40CC5C26' },
     @{ name='Astrolabe-local-patch.dll'; target="$root\runtime\patch\Astrolabe-local-patch.dll"; sha='6D64CE888305924127FCE46458F86C3DD58D344A3B5B01C2A23E8D500FF4F63C' },
     @{ name='Sophon.Downloader-win-x64.zip'; target="$downloads\Sophon.Downloader-win-x64.zip"; sha='93C31BD06B3A8141510F6E08A8C7F8FF55364114FEA339B22F67292E3C1915B1' }
 )
 $mongoUrl = 'https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-8.0.12.zip'
 # Server resources are pinned to the upstream commit this setup was tested with.
-$resourceCommit = 'c0213668889ed05cbeb86660f424c3daf18bfacd'
-$resourceUrl = "https://github.com/MeChen618/AstaPS-Resource/archive/$resourceCommit.zip"
+$resourceCommit = 'f2800e32599f32cde76ae0b4b93ea30b75651e59'
+$resourceUrl = "https://codeload.github.com/MeChen618/AstaPS-Resource/zip/$resourceCommit"
 
 function Get-File([string]$url, [string]$target, [string]$sha) {
     if ((Test-Path $target) -and (!$sha -or (Get-FileHash $target -Algorithm SHA256).Hash -eq $sha)) { Write-Host "  ok: $(Split-Path $target -Leaf)"; return }
@@ -51,13 +50,14 @@ if (!(Test-Path $configPath)) {
 $cfg = Get-LocalConfig
 Write-Host "  client folder: $($cfg.clientPath)"
 
-Write-Host '[2/6] Java 17+'
-if (!$cfg.java -or !(Test-Path $cfg.java)) { throw 'Java not found. Install Java 17 or newer (https://adoptium.net/) or set "java" in local-config.json.' }
+Write-Host '[2/6] Java 21+'
+if (!$cfg.java -or !(Test-Path $cfg.java)) { throw 'Java not found. Install Java 21 or newer (https://adoptium.net/) or set "java" in local-config.json.' }
 $versionLine = (& cmd.exe /d /c "`"$($cfg.java)`" -version 2>&1" | Select-Object -First 1)
-if ($versionLine -match '"(\d+)' -and [int]$matches[1] -lt 17) { throw "Java 17+ required, found: $versionLine" }
+if ($versionLine -match '"(\d+)' -and [int]$matches[1] -lt 21) { throw "Java 21+ required, found: $versionLine" }
 Write-Host "  $versionLine"
 
 Write-Host '[3/6] Release files (server jar, plugin, client patch, downloader)'
+Get-File 'https://github.com/MeChen618/AstaPS/releases/download/7.2.162/grasscutter.jar' "$root/server/grasscutter.jar" '2AB3D86FB2890F271B65E464320B4CAF8E77B7A2DB5F29ABF29E81A1E8892294'
 foreach ($a in $assets) { Get-File "https://github.com/$repo/releases/download/$releaseTag/$($a.name)" $a.target $a.sha }
 if (!(Test-Path "$root\runtime\sophon\Sophon.Downloader.exe")) { Expand-Archive -Force "$downloads\Sophon.Downloader-win-x64.zip" "$root\runtime\sophon" }
 
@@ -68,15 +68,20 @@ if (!(Get-ChildItem "$root\runtime" -Filter mongod.exe -Recurse -ErrorAction Sil
 }
 
 Write-Host '[5/6] Server resources (MeChen618/AstaPS-Resource)'
-if (!(Test-Path "$root\server\resources\ExcelBinOutput")) {
-    Get-File $resourceUrl "$downloads\astaps-resources.zip" $null
-    $tmp = "$downloads\resources-extract"
-    if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp }
-    Expand-Archive -Force "$downloads\astaps-resources.zip" $tmp
-    $inner = Get-ChildItem $tmp -Directory | Select-Object -First 1
-    if (Test-Path "$root\server\resources") { Remove-Item -Recurse -Force "$root\server\resources" }
-    Move-Item $inner.FullName "$root\server\resources"
-    Remove-Item -Recurse -Force $tmp
+$resources = Join-Path $root 'server/resources'
+$marker = Join-Path $resources '.astaps-resource-version'
+if (!(Test-Path "$resources/ExcelBinOutput/AvatarExcelConfigData.json") -or !(Test-Path $marker) -or (Get-Content $marker -Raw).Trim() -ne $resourceCommit) {
+    $archive = Join-Path $downloads "resources-$resourceCommit.zip"
+    Get-File $resourceUrl $archive 'CBE9D2937AB59D5EF2BB5605D26D255D6D3BDD5B36233471D067FD370431F2FE'
+    $stage = Join-Path $downloads ('resources-' + [Guid]::NewGuid())
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [IO.Compression.ZipFile]::ExtractToDirectory($archive, $stage)
+    $source = Join-Path $stage "AstaPS-Resource-$resourceCommit"
+    if (!(Test-Path "$source/ExcelBinOutput/AvatarExcelConfigData.json")) { throw 'Resource archive is incomplete.' }
+    robocopy $source $resources /E /R:1 /W:1 /NFL /NDL /NJH /NJS /NP | Out-Null
+    if ($LASTEXITCODE -ge 8) { throw "Resource installation failed (robocopy $LASTEXITCODE)." }
+    Set-Content -LiteralPath $marker -Value $resourceCommit -Encoding ASCII
+    [IO.Directory]::Delete($stage, $true)
 }
 
 Write-Host '[6/6] Passwords and local account'

@@ -28,7 +28,7 @@ function Disable-Wheel($control){$control.Add_MouseWheel({$_.Handled=$true})}
 function Format-Number($value){'{0:N0}' -f [decimal]$value}
 
 # ---------------- main window ----------------
-$form=New-Object Windows.Forms.Form;$form.Text='原神 7.1 本地服管理器';$form.ClientSize=New-Object Drawing.Size(980,720);$form.MinimumSize=New-Object Drawing.Size(880,660);$form.StartPosition='CenterScreen';$form.Font=New-Object Drawing.Font('Microsoft YaHei UI',10);$form.BackColor=[Drawing.Color]::FromArgb(245,247,251)
+$form=New-Object Windows.Forms.Form;$form.Text='原神 7.2 本地服管理器';$form.ClientSize=New-Object Drawing.Size(980,720);$form.MinimumSize=New-Object Drawing.Size(880,660);$form.StartPosition='CenterScreen';$form.Font=New-Object Drawing.Font('Microsoft YaHei UI',10);$form.BackColor=[Drawing.Color]::FromArgb(245,247,251)
 $header=New-Object Windows.Forms.TableLayoutPanel;$header.Dock='Top';$header.AutoSize=$true;$header.ColumnCount=1;$header.RowCount=2;$header.Padding=New-Object Windows.Forms.Padding(10,6,10,2)
 $titleRow=New-Flow;$titleRow.WrapContents=$false
 $title=New-Object Windows.Forms.Label;$title.Text='原神本地服管理器';$title.AutoSize=$true;$title.Font=New-Object Drawing.Font('Microsoft YaHei UI',16,[Drawing.FontStyle]::Bold)
@@ -131,15 +131,36 @@ function Resolve-ComboId($combo,[string]$what){
 }
 function Set-ComboById($combo,$id){if($null -eq $id){return};$m=@($combo.Items|Where-Object {$_ -like "$id *"});$combo.Text=if($m.Count){$m[0]}else{[string]$id}}
 
+$wishNames=@{}
+foreach($item in @($catalog.avatars)+@($catalog.weapons)){$wishNames[[string]$item.id]=$item.name}
+function Format-WishNames($ids){
+    (@(foreach($id in $ids){$name=$wishNames[[string]$id];if($name){$name}else{[string]$id}}) -join '、')
+}
+function Show-BannerUp($characters,$weapons,$caption){
+    $script:currentUp.character=@($characters)[0]
+    $script:currentUp.weapon=@($weapons)[0]
+    Set-ComboById $character $script:currentUp.character
+    Set-ComboById $weapon $script:currentUp.weapon
+    $bannerCurrent.Text="${caption}：角色 $(Format-WishNames $characters)　｜　武器 $(Format-WishNames $weapons)"
+}
+$poolFile=Join-Path $root 'server/data/LocalBanners.json'
+if(Test-Path $poolFile){
+    $poolRows=Get-Content $poolFile -Raw -Encoding UTF8 | ConvertFrom-Json
+    $actorPool=$poolRows | Where-Object bannerType -eq 'CHARACTER' | Select-Object -First 1
+    $weaponPool=$poolRows | Where-Object bannerType -eq 'WEAPON' | Select-Object -First 1
+    if($actorPool -and $weaponPool){
+        Show-BannerUp $actorPool.rateUpItems5 $weaponPool.rateUpItems5 '已配置 UP'
+        $null=Label $banner ("角色池四星 UP："+(Format-WishNames $actorPool.rateUpItems4)) 20 345 820 32
+    }
+}
+
 function Read-Current {
     $data=Invoke-LocalGameCommand 'status'
     $script:loadingQty=$true
     try{
         foreach($field in $fields){$value=$data.($field.key);if($null -eq $value){throw '服务端尚未更新，请重新进入游戏。'};$boxes[$field.key].Maximum=[Math]::Max([decimal]$field.max,[decimal]$value);$boxes[$field.key].Value=[decimal]$value;$boxes[$field.key].Enabled=$true;$script:loadedQty[$field.key]=[decimal]$value;$originals[$field.key].Text="当前 $(Format-Number $value)"}
     }finally{$script:loadingQty=$false};Update-QtyDirty
-    $script:currentUp.character=if($data.characterUp.Count){[string]$data.characterUp[0]}else{$null};$script:currentUp.weapon=if($data.weaponUp.Count){[string]$data.weaponUp[0]}else{$null}
-    Set-ComboById $character $script:currentUp.character;Set-ComboById $weapon $script:currentUp.weapon
-    $bannerCurrent.Text="当前 UP：角色 $(if($script:currentUp.character){$character.Text}else{'未设置'})　｜　武器 $(if($script:currentUp.weapon){$weapon.Text}else{'未设置'})"
+    Show-BannerUp $data.characterUp $data.weaponUp "当前 UP"
     Set-Connection $true;$status.Text='已读取；填写目标总数量后点击应用。';return $data
 }
 
@@ -178,7 +199,7 @@ $bannerReset.Add_Click({Set-ComboById $character $script:currentUp.character;Set
 
 if($Check -or $CheckOnline){
     $form.CreateControl();$form.PerformLayout()
-    if($boxes.Count -ne 11 -or $tabs.TabPages.Count -ne 6 -or $character.Items.Count -ne 69 -or $weapon.Items.Count -ne 90){throw 'UI construction failed'}
+    if($boxes.Count -ne 11 -or $tabs.TabPages.Count -ne 6 -or $character.Items.Count -ne @($catalog.avatars | Where-Object stars -eq 5).Count -or $weapon.Items.Count -ne $catalog.weapons.Count){throw 'UI construction failed'}
     foreach($key in $boxes.Keys){$grid=$boxes[$key].Parent;if($labels[$key].Parent -ne $grid -or $grid.GetRow($labels[$key]) -ne $grid.GetRow($boxes[$key])){throw "Label misaligned: $key"}}
     if(!$qty.AutoScroll){throw 'Materials cannot scroll'}
     foreach($name in 'Read-All','Read-Gear','Read-Warehouse','Read-WorldLevel','Get-CheckedGearRequests','Get-WeaponCleanupRequest','Get-ArtifactRequest'){if(!(Get-Command $name -ErrorAction SilentlyContinue)){throw "Missing function $name"}}

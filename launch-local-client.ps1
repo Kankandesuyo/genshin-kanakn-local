@@ -43,4 +43,4 @@ $env:ALL_PROXY = ''
 $env:NO_PROXY = 'localhost,127.0.0.1'
 $gameProcess = Start-Process -FilePath "$client\GenshinImpact.exe" -WorkingDirectory $client -WindowStyle Normal -PassThru
 $gameProcess.Id | Set-Content "$root\logs\client-game.pid"
-Write-Host 'Local 7.1 client launched. Use your local player account, not a HoYoverse account.'
+Write-Host 'Local 7.2 client launched. Use your local player account, not a HoYoverse account.'

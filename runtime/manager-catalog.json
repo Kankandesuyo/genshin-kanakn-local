@@ -719,6 +719,18 @@
       "avatarId": 10000150,
       "name": "奥黛塔",
       "stars": 5
+    },
+    {
+      "id": 4136,
+      "avatarId": 10000136,
+      "name": "米提亚",
+      "stars": 5
+    },
+    {
+      "id": 4137,
+      "avatarId": 10000137,
+      "name": "瓦列里",
+      "stars": 4
     }
   ],
   "weapons": [
@@ -1171,6 +1183,11 @@
       "id": 20001,
       "name": "钓鱼竿（内部条目）",
       "nameVerified": false
+    },
+    {
+      "id": 14525,
+      "name": "秘星典谕",
+      "nameVerified": true
     }
   ]
 }

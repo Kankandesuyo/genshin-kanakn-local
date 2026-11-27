@@ -20,7 +20,7 @@ for row in read('AvatarExcelConfigData.json'):
     aid=row['id']
     if aid not in codex or aid not in avatar_items or row.get('useType')!='AVATAR_FORMAL': continue
     if row.get('qualityType') not in ('QUALITY_ORANGE','QUALITY_ORANGE_SP','QUALITY_PURPLE'): continue
-    name=names.get(furniture.get(aid,0)) or names.get(aid) or row.get('iconName','').replace('UI_AvatarIcon_','')
+    name={10000136:"米提亚",10000137:"瓦列里"}.get(aid) or names.get(furniture.get(aid,0)) or names.get(aid) or row.get('iconName','').replace('UI_AvatarIcon_','')
     avatars.append(dict(id=avatar_items[aid],avatarId=aid,name=name,stars=4 if row['qualityType']=='QUALITY_PURPLE' else 5))
 avatars.sort(key=lambda a:a['id'])
 weapon_names=json.loads((root/'runtime/weapon-names-zh.json').read_text(encoding='utf-8-sig'))
